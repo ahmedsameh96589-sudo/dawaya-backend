@@ -2,6 +2,7 @@ const Doctor        = require("../models/Doctor");
 const Consultation  = require("../models/Consultation");
 const { sendToken } = require("../utils/jwt");
 const escapeRegex = require("../utils/escapeRegex");
+const { emitToConsultation } = require("../realtime");
 
 // ─── Public: GET /api/doctors ────────────────────────────────
 exports.getDoctors = async (req, res, next) => {
@@ -299,6 +300,7 @@ exports.replyToConsultation = async (req, res, next) => {
     await consultation.save();
 
     const newMessage = consultation.messages[consultation.messages.length - 1];
+    emitToConsultation(consultation, "consultation:message", { message: newMessage, status: consultation.status });
 
     // ── In-app notification to patient ─────────────────────────
     try {
@@ -419,6 +421,7 @@ exports.closeDoctorConsultation = async (req, res, next) => {
     consultation.closedBy    = "doctor";
     consultation.closeReason = reason || "Closed by doctor";
     await consultation.save();
+    emitToConsultation(consultation, "consultation:updated", { status: consultation.status });
 
     await Doctor.findByIdAndUpdate(req.doctor._id, { $inc: { totalConsultations: 1 } });
 

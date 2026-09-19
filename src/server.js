@@ -1,3 +1,4 @@
+const http       = require("http");
 const express    = require("express");
 const cors       = require("cors");
 const morgan     = require("morgan");
@@ -8,6 +9,7 @@ require("dotenv").config();
 
 const connectDB      = require("./config/db");
 const errorHandler   = require("./middlewares/errorHandler");
+const { initRealtime } = require("./realtime");
 const requireTokenForPrivateUploads = require("./middlewares/privateUploads");
 
 // ── Route imports ─────────────────────────────────────────────
@@ -105,7 +107,9 @@ app.use(errorHandler);
 
 // ── Start ─────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () =>
+const server = http.createServer(app);
+initRealtime(server, { corsOrigins });
+server.listen(PORT, () =>
   console.log(`🚀 DAWAYA Server running on port ${PORT} [${process.env.NODE_ENV || "development"}]`)
 );
 
