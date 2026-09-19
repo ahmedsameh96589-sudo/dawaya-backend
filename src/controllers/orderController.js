@@ -4,6 +4,15 @@ const Medicine     = require("../models/Medicine");
 const Prescription = require("../models/Prescription"); // BUG FIX #3
 const Notification = require("../models/Notification");
 const { sendEmail } = require("../utils/email");
+const { sendPushToUser } = require("../utils/pushNotification");
+
+const STATUS_LABELS = {
+  confirmed:        "Your order is confirmed",
+  preparing:        "Your order is being prepared",
+  out_for_delivery: "Your order is on its way",
+  delivered:        "Your order was delivered",
+  cancelled:        "Your order was cancelled",
+};
 
 const DELIVERY_FEE = 20; // EGP — make dynamic per city if needed
 
@@ -445,6 +454,13 @@ exports.updateOrderStatus = async (req, res, next) => {
     } catch (notificationErr) {
       console.error("🔔 Order status notification failed:", notificationErr.message);
     }
+
+    // Push so the customer sees the change without opening the app.
+    sendPushToUser(order.user, {
+      title: STATUS_LABELS[status] || "Order update",
+      body:  `Order ${order.orderNumber}${note ? `: ${note}` : ""}`,
+      data:  { type: "order_update", orderId: order._id },
+    }).catch((err) => console.error("🔔 Order push failed:", err.message));
 
     res.status(200).json({ success: true, data: { order } });
   } catch (err) { next(err); }
