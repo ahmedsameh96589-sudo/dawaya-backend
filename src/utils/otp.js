@@ -1,9 +1,8 @@
 const crypto = require("crypto");
 
-// Generate a 6-digit numeric OTP
-const generateOTP = () => {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-};
+// Generate a 6-digit numeric OTP from a cryptographically secure source
+// (Math.random is predictable and must not be used for auth codes).
+const generateOTP = () => crypto.randomInt(100000, 1000000).toString();
 
 // Generate a secure random token (for reset password links)
 const generateResetToken = () => {

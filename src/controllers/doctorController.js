@@ -1,13 +1,14 @@
 const Doctor        = require("../models/Doctor");
 const Consultation  = require("../models/Consultation");
 const { sendToken } = require("../utils/jwt");
+const escapeRegex = require("../utils/escapeRegex");
 
 // ─── Public: GET /api/doctors ────────────────────────────────
 exports.getDoctors = async (req, res, next) => {
   try {
     const { specialty, available, page = 1, limit = 12 } = req.query;
     const filter = { isActive: true };
-    if (specialty)            filter.specialty   = new RegExp(specialty, "i");
+    if (specialty)            filter.specialty   = new RegExp(escapeRegex(specialty), "i");
     if (available === "true") filter.isAvailable = true;
 
     const doctors = await Doctor.find(filter)

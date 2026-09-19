@@ -3,6 +3,8 @@ const cors       = require("cors");
 const morgan     = require("morgan");
 const path       = require("path");
 const rateLimit  = require("express-rate-limit");
+const helmet     = require("helmet");
+const jwt        = require("jsonwebtoken");
 require("dotenv").config();
 
 const connectDB      = require("./config/db");
@@ -37,15 +39,32 @@ initFirebase();
 const app = express();
 
 // ── Global Middleware ─────────────────────────────────────────
-app.use(cors());
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
+
+// Browsers only get access from the origins listed in CORS_ORIGINS
+// (comma-separated). The mobile app is not a browser, so CORS never blocks it.
+const corsOrigins = (process.env.CORS_ORIGINS || "").split(",").map((o) => o.trim()).filter(Boolean);
+app.use(cors(corsOrigins.length ? { origin: corsOrigins } : undefined));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 
-// Serve uploaded files
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+// Serve uploaded files. Prescriptions and chat attachments are medical data,
+// so they require a valid user or doctor token; product images stay public.
+const PRIVATE_UPLOAD = /^\/(prescription|attachment)-/;
+const requireTokenForPrivateUploads = (req, res, next) => {
+  if (!PRIVATE_UPLOAD.test(req.path)) return next();
+  const header = req.headers.authorization || "";
+  try {
+    jwt.verify(header.startsWith("Bearer ") ? header.slice(7) : "", process.env.JWT_SECRET);
+    return next();
+  } catch {
+    return res.status(401).json({ success: false, message: "Not authorized." });
+  }
+};
+app.use("/uploads", requireTokenForPrivateUploads, express.static(path.join(__dirname, "../uploads")));
 
-// Rate limiter (100 req / 15 min per IP)
+// Rate limiter (500 req / 15 min per IP)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max:      500,
@@ -53,7 +72,7 @@ const limiter = rateLimit({
 });
 app.use("/api", limiter);
 
-// Strict limiter for auth endpoints (10 req / 15 min)
+// Stricter limiter for auth endpoints (50 req / 15 min per IP)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max:      50,
