@@ -4,11 +4,11 @@ const morgan     = require("morgan");
 const path       = require("path");
 const rateLimit  = require("express-rate-limit");
 const helmet     = require("helmet");
-const jwt        = require("jsonwebtoken");
 require("dotenv").config();
 
 const connectDB      = require("./config/db");
 const errorHandler   = require("./middlewares/errorHandler");
+const requireTokenForPrivateUploads = require("./middlewares/privateUploads");
 
 // ── Route imports ─────────────────────────────────────────────
 const authRoutes          = require("./routes/authRoutes");
@@ -49,19 +49,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 
-// Serve uploaded files. Prescriptions and chat attachments are medical data,
-// so they require a valid user or doctor token; product images stay public.
-const PRIVATE_UPLOAD = /^\/(prescription|attachment)-/;
-const requireTokenForPrivateUploads = (req, res, next) => {
-  if (!PRIVATE_UPLOAD.test(req.path)) return next();
-  const header = req.headers.authorization || "";
-  try {
-    jwt.verify(header.startsWith("Bearer ") ? header.slice(7) : "", process.env.JWT_SECRET);
-    return next();
-  } catch {
-    return res.status(401).json({ success: false, message: "Not authorized." });
-  }
-};
+// Serve uploaded files (prescriptions and chat attachments need a token)
 app.use("/uploads", requireTokenForPrivateUploads, express.static(path.join(__dirname, "../uploads")));
 
 // Rate limiter (500 req / 15 min per IP)
