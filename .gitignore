@@ -1,0 +1,14 @@
+node_modules/
+.env
+uploads/*
+!uploads/.gitkeep
+*.log
+.DS_Store
+
+# Firebase service account keys — never commit
+*firebase-adminsdk*.json
+firebase-service-account.json
+*service-account*.json
+
+# Stray folder from a failed mkdir brace expansion
+{src/

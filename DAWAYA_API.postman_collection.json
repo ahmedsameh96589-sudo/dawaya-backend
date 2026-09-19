@@ -1,0 +1,386 @@
+{
+  "info": {
+    "name": "DAWAYA API v2.0",
+    "description": "Complete DAWAYA Smart Pharmacy Backend API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "token",   "value": "" },
+    { "key": "userId",  "value": "" },
+    { "key": "otp",     "value": "" }
+  ],
+  "item": [
+    {
+      "name": "🔑 Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Ahmed Sameh\",\n  \"email\": \"ahmed@example.com\",\n  \"phone\": \"01012345678\",\n  \"password\": \"Pass@1234\",\n  \"language\": \"en\"\n}" }
+          }
+        },
+        {
+          "name": "Verify OTP — Registration",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/auth/verify-otp",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"otp\": \"{{otp}}\",\n  \"purpose\": \"verification\"\n}" }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"ahmed@example.com\",\n  \"password\": \"Pass@1234\"\n}" }
+          }
+        },
+        {
+          "name": "Verify OTP — Login 2FA",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/auth/verify-otp",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"otp\": \"{{otp}}\",\n  \"purpose\": \"login\"\n}" }
+          }
+        },
+        {
+          "name": "Resend OTP",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/auth/resend-otp",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"purpose\": \"verification\"\n}" }
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/auth/forgot-password",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"ahmed@example.com\"\n}" }
+          }
+        },
+        {
+          "name": "Verify OTP — Forgot Password",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/auth/verify-otp",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"otp\": \"{{otp}}\",\n  \"purpose\": \"forgot_password\"\n}" }
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/auth/reset-password",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"resetToken\": \"PASTE_TOKEN_HERE\",\n  \"newPassword\": \"NewPass@1234\"\n}" }
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET", "url": "{{baseUrl}}/auth/me",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PUT", "url": "{{baseUrl}}/auth/me",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Ahmed Sameh Updated\",\n  \"language\": \"ar\"\n}" }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT", "url": "{{baseUrl}}/auth/change-password",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"currentPassword\": \"Pass@1234\",\n  \"newPassword\": \"NewPass@1234\"\n}" }
+          }
+        },
+        {
+          "name": "Get Addresses",
+          "request": {
+            "method": "GET", "url": "{{baseUrl}}/auth/addresses",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Add Address",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/auth/addresses",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"label\": \"Home\",\n  \"street\": \"123 Tahrir St\",\n  \"building\": \"5\",\n  \"floor\": \"2\",\n  \"apartment\": \"10\",\n  \"city\": \"Cairo\",\n  \"district\": \"Downtown\",\n  \"isDefault\": true\n}" }
+          }
+        },
+        {
+          "name": "Set Default Address",
+          "request": {
+            "method": "PUT", "url": "{{baseUrl}}/auth/addresses/ADDRESS_ID/set-default",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Delete Address",
+          "request": {
+            "method": "DELETE", "url": "{{baseUrl}}/auth/addresses/ADDRESS_ID",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "📂 Categories",
+      "item": [
+        { "name": "Get All Categories", "request": { "method": "GET", "url": "{{baseUrl}}/categories" } },
+        { "name": "Get All Categories + Subcategories", "request": { "method": "GET", "url": "{{baseUrl}}/categories?withSubcategories=true" } },
+        { "name": "Get Single Category", "request": { "method": "GET", "url": "{{baseUrl}}/categories/CATEGORY_ID" } },
+        { "name": "Get Subcategories of Category", "request": { "method": "GET", "url": "{{baseUrl}}/categories/CATEGORY_ID/subcategories" } },
+        {
+          "name": "Create Category (Admin)",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/categories",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"New Category\",\n  \"nameAr\": \"فئة جديدة\",\n  \"description\": \"Category description\",\n  \"sortOrder\": 1\n}" }
+          }
+        },
+        {
+          "name": "Update Category (Admin)",
+          "request": {
+            "method": "PUT", "url": "{{baseUrl}}/categories/CATEGORY_ID",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Updated Category\"\n}" }
+          }
+        },
+        { "name": "Delete Category (Admin)", "request": { "method": "DELETE", "url": "{{baseUrl}}/categories/CATEGORY_ID", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } }
+      ]
+    },
+    {
+      "name": "📂 Subcategories",
+      "item": [
+        { "name": "Get All Subcategories", "request": { "method": "GET", "url": "{{baseUrl}}/subcategories" } },
+        {
+          "name": "Create Subcategory (Admin)",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/subcategories",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"New Subcategory\",\n  \"nameAr\": \"فئة فرعية\",\n  \"category\": \"CATEGORY_ID\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏷 Brands",
+      "item": [
+        { "name": "Get All Brands", "request": { "method": "GET", "url": "{{baseUrl}}/brands" } },
+        { "name": "Get Single Brand", "request": { "method": "GET", "url": "{{baseUrl}}/brands/BRAND_ID" } },
+        {
+          "name": "Create Brand (Admin)",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/brands",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"New Brand\",\n  \"country\": \"Egypt\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💊 Medicines",
+      "item": [
+        { "name": "Get All Medicines", "request": { "method": "GET", "url": "{{baseUrl}}/medicines" } },
+        { "name": "Search Medicines", "request": { "method": "GET", "url": "{{baseUrl}}/medicines?search=panadol" } },
+        { "name": "Filter by Category", "request": { "method": "GET", "url": "{{baseUrl}}/medicines?category=CATEGORY_ID" } },
+        { "name": "Filter by Price Range", "request": { "method": "GET", "url": "{{baseUrl}}/medicines?price[gte]=10&price[lte]=50" } },
+        { "name": "Sort by Price ASC", "request": { "method": "GET", "url": "{{baseUrl}}/medicines?sort=price" } },
+        { "name": "Featured Medicines", "request": { "method": "GET", "url": "{{baseUrl}}/medicines/featured" } },
+        { "name": "Get Single Medicine", "request": { "method": "GET", "url": "{{baseUrl}}/medicines/MEDICINE_ID" } },
+        { "name": "Get Alternatives", "request": { "method": "GET", "url": "{{baseUrl}}/medicines/MEDICINE_ID/alternatives" } },
+        {
+          "name": "Create Medicine (Admin)",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/medicines",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Test Medicine\",\n  \"activeIngredient\": \"Ibuprofen\",\n  \"category\": \"CATEGORY_ID\",\n  \"price\": 25,\n  \"stock\": 100,\n  \"dosageForm\": \"tablet\",\n  \"strength\": \"400mg\"\n}" }
+          }
+        },
+        {
+          "name": "Update Stock (Admin)",
+          "request": {
+            "method": "PATCH", "url": "{{baseUrl}}/medicines/MEDICINE_ID/stock",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"stock\": 150\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🛒 Cart",
+      "item": [
+        { "name": "Get Cart", "request": { "method": "GET", "url": "{{baseUrl}}/cart", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        {
+          "name": "Add to Cart",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/cart/add",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"medicineId\": \"MEDICINE_ID\",\n  \"quantity\": 2\n}" }
+          }
+        },
+        {
+          "name": "Update Cart Item",
+          "request": {
+            "method": "PUT", "url": "{{baseUrl}}/cart/update",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"medicineId\": \"MEDICINE_ID\",\n  \"quantity\": 3\n}" }
+          }
+        },
+        { "name": "Remove from Cart", "request": { "method": "DELETE", "url": "{{baseUrl}}/cart/remove/MEDICINE_ID", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        { "name": "Clear Cart", "request": { "method": "DELETE", "url": "{{baseUrl}}/cart/clear", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        {
+          "name": "Apply Coupon",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/cart/coupon",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"couponCode\": \"DAWAYA10\"\n}" }
+          }
+        },
+        { "name": "Remove Coupon", "request": { "method": "DELETE", "url": "{{baseUrl}}/cart/coupon", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } }
+      ]
+    },
+    {
+      "name": "📦 Orders",
+      "item": [
+        {
+          "name": "Place Order",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/orders",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"deliveryAddress\": {\n    \"street\": \"123 Tahrir St\",\n    \"city\": \"Cairo\",\n    \"district\": \"Downtown\"\n  },\n  \"paymentMethod\": \"cash_on_delivery\",\n  \"notes\": \"Ring the doorbell twice\"\n}" }
+          }
+        },
+        { "name": "Get My Orders", "request": { "method": "GET", "url": "{{baseUrl}}/orders", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        { "name": "Get Order Detail", "request": { "method": "GET", "url": "{{baseUrl}}/orders/ORDER_ID", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        {
+          "name": "Cancel Order",
+          "request": {
+            "method": "PUT", "url": "{{baseUrl}}/orders/ORDER_ID/cancel",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"reason\": \"Changed my mind\"\n}" }
+          }
+        },
+        { "name": "Get All Orders (Admin)", "request": { "method": "GET", "url": "{{baseUrl}}/orders/admin/all", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        {
+          "name": "Update Order Status (Admin)",
+          "request": {
+            "method": "PUT", "url": "{{baseUrl}}/orders/ORDER_ID/status",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"confirmed\",\n  \"note\": \"Order confirmed by pharmacy\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "❤️ Wishlist",
+      "item": [
+        { "name": "Get Wishlist", "request": { "method": "GET", "url": "{{baseUrl}}/wishlist", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        { "name": "Add to Wishlist", "request": { "method": "POST", "url": "{{baseUrl}}/wishlist/MEDICINE_ID", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        { "name": "Remove from Wishlist", "request": { "method": "DELETE", "url": "{{baseUrl}}/wishlist/MEDICINE_ID", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        { "name": "Move to Cart", "request": { "method": "POST", "url": "{{baseUrl}}/wishlist/MEDICINE_ID/move-to-cart", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        { "name": "Clear Wishlist", "request": { "method": "DELETE", "url": "{{baseUrl}}/wishlist", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } }
+      ]
+    },
+    {
+      "name": "⭐ Reviews",
+      "item": [
+        { "name": "Get Medicine Reviews", "request": { "method": "GET", "url": "{{baseUrl}}/reviews/MEDICINE_ID" } },
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/reviews/MEDICINE_ID",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"rating\": 5,\n  \"title\": \"Great medicine!\",\n  \"comment\": \"Very effective, fast relief.\"\n}" }
+          }
+        },
+        { "name": "Get My Reviews", "request": { "method": "GET", "url": "{{baseUrl}}/reviews/my", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        {
+          "name": "Update Review",
+          "request": {
+            "method": "PUT", "url": "{{baseUrl}}/reviews/REVIEW_ID",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"rating\": 4,\n  \"comment\": \"Updated comment\"\n}" }
+          }
+        },
+        { "name": "Delete Review", "request": { "method": "DELETE", "url": "{{baseUrl}}/reviews/REVIEW_ID", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } }
+      ]
+    },
+    {
+      "name": "📄 Prescriptions",
+      "item": [
+        {
+          "name": "Upload Prescription",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/prescriptions",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": { "mode": "formdata", "formdata": [{ "key": "prescription", "type": "file", "src": "" }, { "key": "ocrText", "value": "Panadol\nAmoxil 500mg" }, { "key": "doctorName", "value": "Dr. Smith" }] }
+          }
+        },
+        { "name": "Get My Prescriptions", "request": { "method": "GET", "url": "{{baseUrl}}/prescriptions", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        { "name": "Get Single Prescription", "request": { "method": "GET", "url": "{{baseUrl}}/prescriptions/PRESCRIPTION_ID", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        { "name": "Get Pending Prescriptions (Admin)", "request": { "method": "GET", "url": "{{baseUrl}}/prescriptions/admin/all?status=pending_review", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        {
+          "name": "Review Prescription (Admin)",
+          "request": {
+            "method": "PUT", "url": "{{baseUrl}}/prescriptions/admin/PRESCRIPTION_ID/review",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"approved\",\n  \"reviewNote\": \"Prescription looks valid.\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔔 Notifications",
+      "item": [
+        { "name": "Get Notifications", "request": { "method": "GET", "url": "{{baseUrl}}/notifications", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        { "name": "Mark as Read", "request": { "method": "PUT", "url": "{{baseUrl}}/notifications/NOTIFICATION_ID/read", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        { "name": "Mark All as Read", "request": { "method": "PUT", "url": "{{baseUrl}}/notifications/read-all", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        { "name": "Delete Notification", "request": { "method": "DELETE", "url": "{{baseUrl}}/notifications/NOTIFICATION_ID", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        { "name": "Clear All Notifications", "request": { "method": "DELETE", "url": "{{baseUrl}}/notifications", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        {
+          "name": "Broadcast Notification (Admin)",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/notifications/broadcast",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"🎉 Special Offer!\",\n  \"message\": \"Use code SAVE50 for 50 EGP off your next order!\",\n  \"type\": \"promo\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "⚙️ Admin",
+      "item": [
+        { "name": "Dashboard", "request": { "method": "GET", "url": "{{baseUrl}}/admin/dashboard", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        { "name": "Revenue Stats", "request": { "method": "GET", "url": "{{baseUrl}}/admin/stats/revenue", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        { "name": "Get All Users", "request": { "method": "GET", "url": "{{baseUrl}}/admin/users", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        { "name": "Search Users", "request": { "method": "GET", "url": "{{baseUrl}}/admin/users?search=ahmed", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        { "name": "Get User Detail", "request": { "method": "GET", "url": "{{baseUrl}}/admin/users/USER_ID", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT", "url": "{{baseUrl}}/admin/users/USER_ID",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"isActive\": false\n}" }
+          }
+        },
+        { "name": "Deactivate User", "request": { "method": "DELETE", "url": "{{baseUrl}}/admin/users/USER_ID", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } }
+      ]
+    },
+    {
+      "name": "🏥 Health",
+      "item": [
+        { "name": "Health Check", "request": { "method": "GET", "url": "{{baseUrl}}/health" } }
+      ]
+    }
+  ]
+}
