@@ -3,6 +3,7 @@ const Doctor       = require("../models/Doctor");
 const Notification = require("../models/Notification");
 const { sendEmail } = require("../utils/email");
 const { sendPushToDoctor, sendPushToUser } = require("../utils/pushNotification");
+const { emitToConsultation } = require("../realtime");
 const { validateRating, applyDoctorRating } = require("../utils/doctorRating");
 
 // ─── Helper: email templates ──────────────────────────────────
@@ -233,6 +234,7 @@ exports.sendMessage = async (req, res, next) => {
     await consultation.save();
 
     const newMessage = consultation.messages[consultation.messages.length - 1];
+    emitToConsultation(consultation, "consultation:message", { message: newMessage, status: consultation.status });
 
     // ── In-app notification to the OTHER party ─────────────────
     try {
@@ -416,6 +418,7 @@ exports.closeConsultation = async (req, res, next) => {
     await Doctor.findByIdAndUpdate(consultation.doctor, { $inc: { totalConsultations: 1 } });
 
     await consultation.save();
+    emitToConsultation(consultation, "consultation:updated", { status: consultation.status });
 
     await consultation.populate([
       { path: "doctor", select: "name nameAr avatar specialty isAvailable rating" },

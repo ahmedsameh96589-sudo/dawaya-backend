@@ -1,12 +1,16 @@
+const http       = require("http");
 const express    = require("express");
 const cors       = require("cors");
 const morgan     = require("morgan");
 const path       = require("path");
 const rateLimit  = require("express-rate-limit");
+const helmet     = require("helmet");
 require("dotenv").config();
 
 const connectDB      = require("./config/db");
 const errorHandler   = require("./middlewares/errorHandler");
+const { initRealtime } = require("./realtime");
+const requireTokenForPrivateUploads = require("./middlewares/privateUploads");
 
 // ── Route imports ─────────────────────────────────────────────
 const authRoutes          = require("./routes/authRoutes");
@@ -37,15 +41,20 @@ initFirebase();
 const app = express();
 
 // ── Global Middleware ─────────────────────────────────────────
-app.use(cors());
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
+
+// Browsers only get access from the origins listed in CORS_ORIGINS
+// (comma-separated). The mobile app is not a browser, so CORS never blocks it.
+const corsOrigins = (process.env.CORS_ORIGINS || "").split(",").map((o) => o.trim()).filter(Boolean);
+app.use(cors(corsOrigins.length ? { origin: corsOrigins } : undefined));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 
-// Serve uploaded files
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+// Serve uploaded files (prescriptions and chat attachments need a token)
+app.use("/uploads", requireTokenForPrivateUploads, express.static(path.join(__dirname, "../uploads")));
 
-// Rate limiter (100 req / 15 min per IP)
+// Rate limiter (500 req / 15 min per IP)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max:      500,
@@ -53,7 +62,7 @@ const limiter = rateLimit({
 });
 app.use("/api", limiter);
 
-// Strict limiter for auth endpoints (10 req / 15 min)
+// Stricter limiter for auth endpoints (50 req / 15 min per IP)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max:      50,
@@ -98,7 +107,9 @@ app.use(errorHandler);
 
 // ── Start ─────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () =>
+const server = http.createServer(app);
+initRealtime(server, { corsOrigins });
+server.listen(PORT, () =>
   console.log(`🚀 DAWAYA Server running on port ${PORT} [${process.env.NODE_ENV || "development"}]`)
 );
 

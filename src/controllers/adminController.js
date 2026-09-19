@@ -3,6 +3,7 @@ const Medicine = require("../models/Medicine");
 const Order    = require("../models/Order");
 const Category = require("../models/Category");
 const Brand    = require("../models/Brand");
+const escapeRegex = require("../utils/escapeRegex");
 
 // ─── GET /api/admin/dashboard ─────────────────────────────────
 exports.getDashboard = async (req, res, next) => {
@@ -66,7 +67,7 @@ exports.getUsers = async (req, res, next) => {
     if (role)     filter.role     = role;
     if (isActive !== undefined) filter.isActive = isActive === "true";
     if (search) {
-      const re = new RegExp(search, "i");
+      const re = new RegExp(escapeRegex(search), "i");
       filter.$or = [{ name: re }, { email: re }, { phone: re }];
     }
 

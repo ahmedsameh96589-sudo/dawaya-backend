@@ -13,7 +13,8 @@ npm install
 
 # 2. Setup environment
 cp .env.example .env
-# Edit .env — fill in MONGO_URI, JWT_SECRET, email & Twilio credentials
+# Edit .env — fill in MONGO_URI, JWT_SECRET, email & Twilio credentials,
+# NEWS_API_KEY (newsapi.org) and optionally CORS_ORIGINS
 
 # 3. Seed sample data
 npm run seed
@@ -24,6 +25,25 @@ npm run dev
 
 Server: `http://localhost:5000`
 Health: `http://localhost:5000/api/health`
+
+```bash
+# Run the tests (Jest + Supertest)
+npm test
+```
+
+---
+
+## ⚡ Real-time chat (Socket.IO)
+
+The server also speaks Socket.IO on the same port. Connect with the REST JWT:
+
+```js
+const socket = io("http://localhost:5000", { auth: { token } });
+socket.on("consultation:message", ({ consultationId, message, status }) => { /* new message */ });
+socket.on("consultation:updated", ({ consultationId, status }) => { /* closed / activated */ });
+```
+
+Each connection joins a room for its account (`user:<id>` or `doctor:<id>`); the consultation controllers emit to both participants whenever a message is sent or a consultation is closed. Sending still goes through `POST /api/consultations/:id/messages`.
 
 ---
 
